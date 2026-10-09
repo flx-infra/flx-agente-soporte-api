@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# Investigador de integraciones de la Flexxus API (sin dominio por ahora)
+#
+# Codigo e imagen: bitbucket.org/flexxus_id/flx-integrador-web
+# Este repo es solo el stack: lo que Portainer despliega.
+#
+# Sin dominio: publica un puerto en la red interna (http://<ip del swarm>:${PORT_PUBLICO}).
+# Cuando tenga dominio, se agregan las labels de Traefik como en los otros stacks.
+#
+# Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO,
+# y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, BITBUCKET_TOKEN,
+# BITBUCKET_GIT_USER, HELPDESK_EMAIL, HELPDESK_PASSWORD, APP_USER, APP_PASSWORD.
+# ---------------------------------------------------------------------------
+version: '3.6'
+
+services:
+  web:
+    image: fabreguesm/flx-integrador-web:0.1.0
+    hostname: flx-integrador-web
+    ports:
+      - target: 3000
+        published: ${PORT_PUBLICO}
+        protocol: tcp
+        mode: ingress
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN}
+      - BITBUCKET_TOKEN=${BITBUCKET_TOKEN}
+      - BITBUCKET_GIT_USER=${BITBUCKET_GIT_USER}
+      - HELPDESK_EMAIL=${HELPDESK_EMAIL}
+      - HELPDESK_PASSWORD=${HELPDESK_PASSWORD}
+      - APP_USER=${APP_USER}
+      - APP_PASSWORD=${APP_PASSWORD}
+    # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
+    # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
+    volumes:
+      - data:/data
+    deploy:
+      placement:
+        constraints: ["${NODE}"]
+      restart_policy:
+        condition: any
+        delay: 10s
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
+
+volumes:
+  data:
+    name: "${SERVICE_NAME}_data"
