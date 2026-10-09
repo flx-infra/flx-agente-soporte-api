@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # Asistente de Soporte API de Flexxus (sin dominio por ahora)
 #
-# Codigo e imagen: bitbucket.org/flexxus_id/flx-soporte-api
+# Codigo e imagen: bitbucket.org/flexxus_id/flx-agente-soporte-api
 # Este repo es solo el stack: lo que Portainer despliega.
 #
 # Sin dominio: publica un puerto en la red interna (http://<ip del swarm>:${PORT_PUBLICO}).
@@ -15,8 +15,8 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-soporte-api:0.2.1
-    hostname: flx-soporte-api
+    image: fabreguesm/flx-agente-soporte-api:0.2.1
+    hostname: flx-agente-soporte-api
     ports:
       - target: 3000
         published: ${PORT_PUBLICO}
