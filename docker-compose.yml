@@ -1,13 +1,13 @@
 # ---------------------------------------------------------------------------
-# Investigador de integraciones de la Flexxus API (sin dominio por ahora)
+# Asistente de Soporte API de Flexxus (sin dominio por ahora)
 #
-# Codigo e imagen: bitbucket.org/flexxus_id/flx-integrador-web
+# Codigo e imagen: bitbucket.org/flexxus_id/flx-soporte-api
 # Este repo es solo el stack: lo que Portainer despliega.
 #
 # Sin dominio: publica un puerto en la red interna (http://<ip del swarm>:${PORT_PUBLICO}).
 # Cuando tenga dominio, se agregan las labels de Traefik como en los otros stacks.
 #
-# Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO,
+# Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO, DATA_VOLUME,
 # y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, BITBUCKET_TOKEN,
 # BITBUCKET_GIT_USER, HELPDESK_EMAIL, HELPDESK_PASSWORD, APP_USER, APP_PASSWORD.
 # ---------------------------------------------------------------------------
@@ -15,8 +15,8 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-integrador-web:0.1.2
-    hostname: flx-integrador-web
+    image: fabreguesm/flx-soporte-api:0.2.0
+    hostname: flx-soporte-api
     ports:
       - target: 3000
         published: ${PORT_PUBLICO}
@@ -34,6 +34,7 @@ services:
       - APP_PASSWORD=${APP_PASSWORD}
     # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
     # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
+    # DATA_VOLUME=flx-integrador-web_data conserva el historial y los clones de antes del cambio de nombre.
     volumes:
       - data:/data
     deploy:
@@ -49,4 +50,4 @@ services:
 
 volumes:
   data:
-    name: "${SERVICE_NAME}_data"
+    name: "${DATA_VOLUME}"
