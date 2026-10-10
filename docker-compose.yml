@@ -17,7 +17,7 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:0.9.2
+    image: fabreguesm/flx-agente-soporte-api:1.0.0
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -40,8 +40,10 @@ services:
       - MEMORIA_LEER=${MEMORIA_LEER}
       # Etapa 2: el Helpdesk se lee y se responde por flx-mcp-helpdesk (stack propio, red flx-agentes).
       - HELPDESK_MCP_URL=${HELPDESK_MCP_URL}
-      # Etapa 3: flx-mcp-codigo (por ahora solo para /api/agentes/salud; el analisis sigue con el codigo embebido).
+      # Etapa 5: los agentes usan flx-mcp-codigo y flx-mcp-documentos (SERVICIOS_COMPARTIDOS=0 vuelve al plugin embebido).
       - CODIGO_MCP_URL=${CODIGO_MCP_URL}
+      - DOCUMENTOS_MCP_URL=${DOCUMENTOS_MCP_URL}
+      - SERVICIOS_COMPARTIDOS=${SERVICIOS_COMPARTIDOS}
     # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
     # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
     # DATA_VOLUME=flx-integrador-web_data conserva el historial y los clones de antes del cambio de nombre.
