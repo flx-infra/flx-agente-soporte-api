@@ -10,13 +10,14 @@
 # Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO, DATA_VOLUME,
 # y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, BITBUCKET_TOKEN,
 # BITBUCKET_GIT_USER, HELPDESK_EMAIL, HELPDESK_PASSWORD, APP_USER, APP_PASSWORD, MCP_TOKEN,
-# MEMORIA_URL (http://flx-mcp-memoria_mcp:8100/mcp, por la red flx-agentes) y MEMORIA_LEER.
+# MEMORIA_URL (http://flx-mcp-memoria_mcp:8100/mcp, por la red flx-agentes), MEMORIA_LEER y
+# HELPDESK_MCP_URL (http://flx-agente-soporte-api_helpdesk:8101/mcp).
 # ---------------------------------------------------------------------------
 version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:0.8.1
+    image: fabreguesm/flx-agente-soporte-api:0.9.0
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -37,6 +38,8 @@ services:
       # Etapa 1: historial tambien en flx-mcp-memoria (Postgres). MEMORIA_LEER=1 lee de ahi; vacio, de los archivos.
       - MEMORIA_URL=${MEMORIA_URL}
       - MEMORIA_LEER=${MEMORIA_LEER}
+      # Etapa 2: el Helpdesk se lee y se responde por flx-mcp-helpdesk (servicio helpdesk de este stack).
+      - HELPDESK_MCP_URL=${HELPDESK_MCP_URL}
     # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
     # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
     # DATA_VOLUME=flx-integrador-web_data conserva el historial y los clones de antes del cambio de nombre.
@@ -46,6 +49,30 @@ services:
       - agentes
     volumes:
       - data:/data
+    deploy:
+      placement:
+        constraints: ["${NODE}"]
+      restart_policy:
+        condition: any
+        delay: 10s
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
+
+
+  # flx-mcp-helpdesk: acceso compartido de los agentes al Helpdesk (lo usara tambien el Cotizador).
+  # Vive en este stack para usar las mismas credenciales HELPDESK_EMAIL / HELPDESK_PASSWORD que ya estan
+  # cargadas aca; no publica puerto: se usa por la red flx-agentes (http://flx-agente-soporte-api_helpdesk:8101/mcp).
+  helpdesk:
+    image: fabreguesm/flx-mcp-helpdesk:0.1.0
+    hostname: flx-mcp-helpdesk
+    networks:
+      - agentes
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+      - HELPDESK_EMAIL=${HELPDESK_EMAIL}
+      - HELPDESK_PASSWORD=${HELPDESK_PASSWORD}
     deploy:
       placement:
         constraints: ["${NODE}"]
