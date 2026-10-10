@@ -17,7 +17,7 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:0.9.1
+    image: fabreguesm/flx-agente-soporte-api:0.9.2
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
