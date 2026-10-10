@@ -9,13 +9,14 @@
 #
 # Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO, DATA_VOLUME,
 # y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, BITBUCKET_TOKEN,
-# BITBUCKET_GIT_USER, HELPDESK_EMAIL, HELPDESK_PASSWORD, APP_USER, APP_PASSWORD.
+# BITBUCKET_GIT_USER, HELPDESK_EMAIL, HELPDESK_PASSWORD, APP_USER, APP_PASSWORD, MCP_TOKEN,
+# MEMORIA_URL, MEMORIA_TOKEN (el de flx-mcp-memoria) y MEMORIA_LEER.
 # ---------------------------------------------------------------------------
 version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:0.7.1
+    image: fabreguesm/flx-agente-soporte-api:0.8.0
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -33,6 +34,10 @@ services:
       - APP_USER=${APP_USER}
       - APP_PASSWORD=${APP_PASSWORD}
       - MCP_TOKEN=${MCP_TOKEN}
+      # Etapa 1: historial tambien en flx-mcp-memoria (Postgres). MEMORIA_LEER=1 lee de ahi; vacio, de los archivos.
+      - MEMORIA_URL=${MEMORIA_URL}
+      - MEMORIA_TOKEN=${MEMORIA_TOKEN}
+      - MEMORIA_LEER=${MEMORIA_LEER}
     # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
     # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
     # DATA_VOLUME=flx-integrador-web_data conserva el historial y los clones de antes del cambio de nombre.
