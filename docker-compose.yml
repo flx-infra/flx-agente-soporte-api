@@ -8,8 +8,8 @@
 # Cuando tenga dominio, se agregan las labels de Traefik como en los otros stacks.
 #
 # Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO, DATA_VOLUME,
-# y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, BITBUCKET_TOKEN,
-# BITBUCKET_GIT_USER, HELPDESK_EMAIL, HELPDESK_PASSWORD, APP_USER, APP_PASSWORD, MCP_TOKEN,
+# y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, HELPDESK_EMAIL, HELPDESK_PASSWORD,
+# APP_USER, APP_PASSWORD, MCP_TOKEN,
 # MEMORIA_URL (http://flx-mcp-memoria_mcp:8100/mcp, por la red flx-agentes), MEMORIA_LEER y
 # HELPDESK_MCP_URL (http://flx-mcp-helpdesk_mcp:8101/mcp).
 # ---------------------------------------------------------------------------
@@ -17,7 +17,7 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:1.1.0
+    image: fabreguesm/flx-agente-soporte-api:1.2.0
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -28,8 +28,6 @@ services:
       - TZ=America/Argentina/Buenos_Aires
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN}
-      - BITBUCKET_TOKEN=${BITBUCKET_TOKEN}
-      - BITBUCKET_GIT_USER=${BITBUCKET_GIT_USER}
       - HELPDESK_EMAIL=${HELPDESK_EMAIL}
       - HELPDESK_PASSWORD=${HELPDESK_PASSWORD}
       - APP_USER=${APP_USER}
@@ -40,10 +38,9 @@ services:
       - MEMORIA_LEER=${MEMORIA_LEER}
       # Etapa 2: el Helpdesk se lee y se responde por flx-mcp-helpdesk (stack propio, red flx-agentes).
       - HELPDESK_MCP_URL=${HELPDESK_MCP_URL}
-      # Etapa 5: los agentes usan flx-mcp-codigo y flx-mcp-documentos (SERVICIOS_COMPARTIDOS=0 vuelve al plugin embebido).
+      # Servicios compartidos (obligatorios desde 1.2.0: ya no hay plugin embebido). Los clones de la API viven en flx-mcp-codigo.
       - CODIGO_MCP_URL=${CODIGO_MCP_URL}
       - DOCUMENTOS_MCP_URL=${DOCUMENTOS_MCP_URL}
-      - SERVICIOS_COMPARTIDOS=${SERVICIOS_COMPARTIDOS}
     # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
     # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
     # DATA_VOLUME=flx-integrador-web_data conserva el historial y los clones de antes del cambio de nombre.
