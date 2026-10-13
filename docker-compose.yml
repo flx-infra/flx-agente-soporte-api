@@ -16,7 +16,7 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:2.1.0
+    image: fabreguesm/flx-agente-soporte-api:2.1.1
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -39,6 +39,7 @@ services:
       - CODIGO_MCP_URL=${CODIGO_MCP_URL}
       - DOCUMENTOS_MCP_URL=${DOCUMENTOS_MCP_URL}
       - RUNNER_URL=http://flx-agentes-runner_runner:3000
+      - SAR_MCP_URL=http://flx-mcp-sar_mcp:8104/mcp
       - RUNNER_TOKEN=${RUNNER_TOKEN}
       # Detras del portal flx-agentes-web: mismo PORTAL_SECRET que el portal. Vacio, la web sigue con su propio usuario.
       - PORTAL_SECRET=${PORTAL_SECRET}
