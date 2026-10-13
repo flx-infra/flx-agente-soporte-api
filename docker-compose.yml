@@ -8,7 +8,6 @@
 # Cuando tenga dominio, se agregan las labels de Traefik como en los otros stacks.
 #
 # Variables del stack: SERVICE_NAME, NODE, LOKI_URL, PORT_PUBLICO, DATA_VOLUME,
-# y los secretos ANTHROPIC_API_KEY o CLAUDE_CODE_OAUTH_TOKEN, HELPDESK_EMAIL, HELPDESK_PASSWORD,
 # APP_USER, APP_PASSWORD, MCP_TOKEN,
 # MEMORIA_URL (http://flx-mcp-memoria_mcp:8100/mcp, por la red flx-agentes), MEMORIA_LEER y
 # HELPDESK_MCP_URL (http://flx-mcp-helpdesk_mcp:8101/mcp).
@@ -17,7 +16,7 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:1.5.0
+    image: fabreguesm/flx-agente-soporte-api:2.0.0
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -26,8 +25,6 @@ services:
         mode: ingress
     environment:
       - TZ=America/Argentina/Buenos_Aires
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN}
       - HELPDESK_EMAIL=${HELPDESK_EMAIL}
       - HELPDESK_PASSWORD=${HELPDESK_PASSWORD}
       - APP_USER=${APP_USER}
@@ -41,8 +38,6 @@ services:
       # Servicios compartidos (obligatorios desde 1.2.0: ya no hay plugin embebido). Los clones de la API viven en flx-mcp-codigo.
       - CODIGO_MCP_URL=${CODIGO_MCP_URL}
       - DOCUMENTOS_MCP_URL=${DOCUMENTOS_MCP_URL}
-      # Etapa 3: MOTOR=runner corre los analisis en flx-agentes-runner; vacio o local, en este contenedor (vuelta atras).
-      - MOTOR=${MOTOR}
       - RUNNER_URL=http://flx-agentes-runner_runner:3000
       - RUNNER_TOKEN=${RUNNER_TOKEN}
       - AGENTE_URL=http://flx-agente-soporte-api_web:3000/mcp-agente
