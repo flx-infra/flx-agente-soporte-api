@@ -16,7 +16,7 @@ version: '3.6'
 
 services:
   web:
-    image: fabreguesm/flx-agente-soporte-api:2.0.0
+    image: fabreguesm/flx-agente-soporte-api:2.1.0
     hostname: flx-agente-soporte-api
     ports:
       - target: 3000
@@ -40,6 +40,8 @@ services:
       - DOCUMENTOS_MCP_URL=${DOCUMENTOS_MCP_URL}
       - RUNNER_URL=http://flx-agentes-runner_runner:3000
       - RUNNER_TOKEN=${RUNNER_TOKEN}
+      # Detras del portal flx-agentes-web: mismo PORTAL_SECRET que el portal. Vacio, la web sigue con su propio usuario.
+      - PORTAL_SECRET=${PORTAL_SECRET}
       - AGENTE_URL=http://flx-agente-soporte-api_web:3000/mcp-agente
     # /data: clones de flxwebapi y flxwebapi-v2, historial compartido de analisis y config de Claude.
     # El volumen vive en el nodo de NODE: si el servicio cambia de nodo, el historial arranca vacio.
